@@ -19,13 +19,13 @@ Konvoy in AWS
 Because persistent volumes are used here it is important to tear the application down once the lab/demo is completed.
 
 ## MySQL-ReplicationExample.sh -a | all
-### Includes bringing the application up and running through all of the tests
-### Application up only:   MySQL-ReplicationExample.sh -u | up
-### Test application only: MySQL-ReplicationExample.sh -t | test
 
-### Application up:
+Includes bringing the application up and running through all of the tests
+
+#### Application Going Up Section:
+Application up only:   MySQL-ReplicationExample.sh -u | up
 ```
-Scripts MySQL-ReplicationExample $ bash MySQL-ReplicationExample.sh all
+JD $ bash MySQL-ReplicationExample.sh all
  MySQL-ReplicationExample.sh - Online
 
 configmap/mysql created
@@ -48,7 +48,10 @@ mysql-2   2/2     Running   0          52s
 kubectl run mysql-client --image=mysql:5.7 -i --rm --restart=Never -- mysql -h mysql-0.mysql < ./Files/mysql-0.mysql
 If you don't see a command prompt, try pressing enter.
 pod "mysql-client" deleted
+```
 
+Checking DB is populated and that each pod is active
+```
  MySQL-ReplicationExample.sh - Check record in DB
 
  $ kubectl run mysql-client --image=mysql:5.7 -i -t --rm --restart=Never -- mysql -h mysql-read -e "SELECT * FROM test.messages"
@@ -74,7 +77,7 @@ Error attaching, falling back to logs: unable to upgrade connection: container m
 +-------------+---------------------+
 | @@server_id | NOW()               |
 +-------------+---------------------+
-|         100 | 2019-06-28 22:33:35 |
+|         102 | 2019-06-28 22:33:35 |
 +-------------+---------------------+
 +-------------+---------------------+
 | @@server_id | NOW()               |
@@ -87,8 +90,12 @@ Error attaching, falling back to logs: unable to upgrade connection: container m
 |         101 | 2019-06-28 22:33:35 |
 +-------------+---------------------+
 pod "mysql-client-loop" deleted
+```
+#### Application Test Section:
+Test application only: MySQL-ReplicationExample.sh -t | test
 
-TESTING: YES
+- Test SQL Service Failure: Restarting mysql-2 service
+```
  MySQL-ReplicationExample.sh - Testing SQL service failure (restarting mysql-2 service)
  $ kubectl exec mysql-2 -c mysql -- /etc/init.d/mysql restart
 Stopping MySQL Community Server 5.7.26.
@@ -123,7 +130,10 @@ Stopping MySQL Community Server 5.7.26.
 pod "mysql-client-loop" deleted
 
  MySQL-ReplicationExample.sh - Notice zero MySQL-2 (Server: 102) query hits above
+```
 
+- Test SQL Pod Failure: Delete mysql-2's pod and see automatic recovery
+```
  MySQL-ReplicationExample.sh - Testing SQL pod failure
  $ kubectl delete pod mysql-2
 pod "mysql-2" deleted
@@ -163,7 +173,10 @@ mysql-2   0/2     Init:0/2   0          0s
 pod "mysql-client-loop" deleted
 
  MySQL-ReplicationExample.sh - Notice zero MySQL-2 (Server: 102) query hits above
+```
 
+- Test Node Drain: Drain mysql-2's node and see automatic recovery
+```
  MySQL-ReplicationExample.sh - Testing automatic pod recovery from node drain
  $ kubectl drain Init:0/2 --force --delete-local-data --ignore-daemonsets
 error: the server doesn't have a resource type "Init:0"
@@ -182,7 +195,10 @@ NAME      READY   STATUS    RESTARTS   AGE
 mysql-0   2/2     Running   0          3m7s
 mysql-1   2/2     Running   0          2m38s
 mysql-2   2/2     Running   0          15s
+```
 
+- Test SQL Scale: Increase mysql's pods to 5
+```
  $ kubectl scale statefulset mysql  --replicas=5
 statefulset.apps/mysql scaled
 
@@ -227,11 +243,12 @@ pod "mysql-client-loop" deleted
 ```
 
 ## MySQL-ReplicationExample.sh -d | down
-### Brings the application down from 3 or 5 SQL pods/persistent volumes
 
-### Application down:
+Brings this application down including persistent volumes
+
+#### Application down:
 ```
-Scripts MySQL-ReplicationExample $ bash MySQL-ReplicationExample.sh down
+JD $ bash MySQL-ReplicationExample.sh down
  MySQL-ReplicationExample.sh - Down
 
 statefulset.apps "mysql" deleted
