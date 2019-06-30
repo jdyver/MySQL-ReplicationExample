@@ -61,7 +61,7 @@ Checking DB is populated and that each pod is active
 | hello   |
 +---------+
 pod "mysql-client" deleted
- MySQL-ReplicationExample.sh - kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done
+ MySQL-ReplicationExample.sh - kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
 If you don't see a command prompt, try pressing enter.
 Error attaching, falling back to logs: unable to upgrade connection: container mysql-client-loop not found in pod mysql-client-loop_default
 +-------------+---------------------+
@@ -101,7 +101,7 @@ Test application only: MySQL-ReplicationExample.sh -t | test
 Stopping MySQL Community Server 5.7.26.
 ..command terminated with exit code 137
 
- MySQL-ReplicationExample.sh - kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done
+ MySQL-ReplicationExample.sh - kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
 +-------------+---------------------+
 | @@server_id | NOW()               |
 +-------------+---------------------+
@@ -144,7 +144,7 @@ mysql-0   2/2     Running    0          2m52s
 mysql-1   2/2     Running    0          2m23s
 mysql-2   0/2     Init:0/2   0          0s
 
- MySQL-ReplicationExample.sh - kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done
+ MySQL-ReplicationExample.sh - kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
 +-------------+---------------------+
 | @@server_id | NOW()               |
 +-------------+---------------------+
