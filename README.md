@@ -176,6 +176,8 @@ pod "mysql-client-loop" deleted
 ```
 
 - Test Node Drain: Drain mysql-2's node and see automatic recovery
+(Love bugs...  broke in automation bc the pod isn't finished intializing from previous test; will add check)
+
 ```
  MySQL-ReplicationExample.sh - Testing automatic pod recovery from node drain
  $ kubectl drain Init:0/2 --force --delete-local-data --ignore-daemonsets

@@ -9,7 +9,9 @@
 
 # Requires: Kubectl setup to k8s cluster
 
-# TODO - Check kubectl get nodes
+# TODO: Test / document online mode
+
+# Check kubectl get nodes
 TASK=$(kubectl get nodes | grep Ready)
 if [ "$TASK" == "" ]
 then
