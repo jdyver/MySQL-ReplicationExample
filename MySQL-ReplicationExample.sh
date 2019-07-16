@@ -256,14 +256,14 @@ then
 
     ## Test draining node
     echo " MySQL-ReplicationExample.sh - Testing automatic pod recovery from node drain"
-    NODE=$(kubectl get pod mysql-2 -o wide | awk '{print $3}' | sed -n 2p)
-    echo " $ kubectl drain $NODE --force --delete-local-data --ignore-daemonsets"
-    kubectl drain $NODE --force --delete-local-data --ignore-daemonsets
+    NODE0=$(kubectl get pod mysql-2 -o wide | awk '{print $3}' | sed -n 2p)
+    echo " $ kubectl drain $NODE0 --force --delete-local-data --ignore-daemonsets"
+    kubectl drain $NODE0 --force --delete-local-data --ignore-daemonsets
     echo
     echo " $ kubectl get pod mysql-2 -o wide"
     kubectl get pod mysql-2 -o wide
     echo
-    printf "MySQL-ReplicationExample.sh - Drained $NODE - mysql-2 fully recovered to [..."
+    printf "MySQL-ReplicationExample.sh - Drained $NODE0 - mysql-2 fully recovered to [..."
     while true
 	do
         TASK=$(kubectl get pod mysql-2 -o wide | awk '{print $3}' | sed -n 2p)
@@ -271,8 +271,8 @@ then
         then
             printf "."
         else
-            NODE=$(kubectl get pod mysql-2 -o wide | awk '{print $3}' | sed -n 2p)
-            printf ".] $NODE"
+            NODE1=$(kubectl get pod mysql-2 -o wide | awk '{print $3}' | sed -n 2p)
+            printf ".] $NODE1"
             echo
             kubectl get pod mysql-2 -o wide
             echo
@@ -281,6 +281,10 @@ then
     	sleep 5
     done        
     read -p " Press ENTER to continue: "
+
+    echo "MySQL-ReplicationExample.sh - Bring node back"
+    echo " $ kubectl uncordon $NODE0"
+    kubectl uncordon $NODE0
 
     ## Test scaling pods
     echo "MySQL-ReplicationExample.sh - Testing pod scale from 3 to 5"
