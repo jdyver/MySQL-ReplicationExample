@@ -45,7 +45,7 @@ case "$2" in
 	EXAMPLE_PATH="./Files/"
 	;;
 *)
-	echo "Fail - MySQL-ReplicationExample.sh -u | up | up online | -d | down 
+	echo "Fail - MySQL-ReplicationExample.sh -u | up | up online | -d | down | -t | test | -a | all
 	- Error in Argument 2"
 	echo
 	exit
@@ -104,7 +104,7 @@ case "$1" in
         then
            	printf "."
         else
-            printf "] - Up"
+            printf ".] - Up"
             echo
             sleep 15
             let N++
@@ -152,6 +152,10 @@ case "$1" in
 
     echo " MySQL-ReplicationExample.sh - kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic \"for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done\""
     kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
+    echo
+
+    echo " MySQL-ReplicationExample.sh - MySQL Pods replicating and populated"
+    echo " - To run through tests: MySQL-ReplicationExample.sh -t | test"
     echo
     ;;
 ############################################################################################################################################################################################ END APP UP
@@ -215,6 +219,7 @@ then
     echo
     echo " MySQL-ReplicationExample.sh - Notice zero MySQL-2 (Server: 102) query hits above"
     echo
+    read -p " Press ENTER to continue: "
 
     ## Test SQL pod failure
     echo " MySQL-ReplicationExample.sh - Testing SQL pod failure"
@@ -229,6 +234,25 @@ then
     echo
     echo " MySQL-ReplicationExample.sh - Notice zero MySQL-2 (Server: 102) query hits above"
     echo
+    printf " MySQL-ReplicationExample.sh - MySQL Pod 2 Deployment [..."
+    sleep 10
+	while true
+	do
+    	# Get pod status
+    	TASK=$(kubectl get pods | grep mysql-2 | awk '{print $3}')
+        if [ "$TASK" != "Running" ]
+        then
+           	printf "."
+        else
+            printf ".] - Up"
+            echo
+        fi
+    	sleep 5
+	done
+    echo " MySQL-ReplicationExample.sh: kubectl get pods -l app=mysql"
+    kubectl get pods -l app=mysql
+    echo
+    read -p " Press ENTER to continue: "
 
     ## Test draining node
     echo " MySQL-ReplicationExample.sh - Testing automatic pod recovery from node drain"
@@ -248,7 +272,7 @@ then
             printf "."
         else
             NODE=$(kubectl get pod mysql-2 -o wide | awk '{print $3}' | sed -n 2p)
-            printf "] $NODE"
+            printf ".] $NODE"
             echo
             kubectl get pod mysql-2 -o wide
             echo
@@ -256,9 +280,10 @@ then
         fi
     	sleep 5
     done        
+    read -p " Press ENTER to continue: "
 
     ## Test scaling pods
-    echo "MySQL-ReplicationExample.sh - Testing automatic pod recovery from node drain"
+    echo "MySQL-ReplicationExample.sh - Testing pod scale from 3 to 5"
     echo " $ kubectl get pods -l app=mysql"
     kubectl get pods -l app=mysql
     echo
@@ -274,7 +299,7 @@ then
         then
             printf "."
         else
-            printf "] - Up"
+            printf ".] - Up"
             kubectl get pods -l app=mysql
             echo
             kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
@@ -284,7 +309,15 @@ then
             break
         fi
     	sleep 5
-    done        
+    done
+    echo
+    read -p " Press ENTER to continue: "
+    echo " MySQL-ReplicationExample.sh - Going back to 3"
+    kubectl scale statefulset mysql --replicas=3
+    kubectl delete pvc data-mysql-3
+    kubectl delete pvc data-mysql-4
+    echo
+
     echo " MySQL-ReplicationExample.sh - Testing Complete"
     echo
 fi

@@ -200,6 +200,7 @@ mysql-2   2/2     Running   0          15s
 ```
 
 - Test SQL Scale: Increase mysql's pods to 5
+
 ```
  $ kubectl scale statefulset mysql  --replicas=5
 statefulset.apps/mysql scaled
