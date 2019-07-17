@@ -246,6 +246,7 @@ then
         else
             printf ".] - Up"
             echo
+            break
         fi
     	sleep 5
 	done
@@ -262,6 +263,7 @@ then
     echo
     echo " $ kubectl get pod mysql-2 -o wide"
     kubectl get pod mysql-2 -o wide
+    sleep 5 ####### MAY NEED TO ADD MORE TIME...
     echo
     printf "MySQL-ReplicationExample.sh - Drained $NODE0 - mysql-2 fully recovered to [..."
     while true
