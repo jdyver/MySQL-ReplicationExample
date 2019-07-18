@@ -98,7 +98,6 @@ case "$1" in
 	## Check Pods
 	while true
 	do
-    	# Get pod status
     	TASK=$(kubectl get pods | grep $POD_N | awk '{print $3}')
         if [ "$TASK" != "Running" ]
         then
@@ -238,7 +237,6 @@ then
     sleep 10
 	while true
 	do
-    	# Get pod status
     	TASK=$(kubectl get pods | grep mysql-2 | awk '{print $3}')
         if [ "$TASK" != "Running" ]
         then
@@ -263,7 +261,7 @@ then
     echo
     echo " $ kubectl get pod mysql-2 -o wide"
     kubectl get pod mysql-2 -o wide
-    sleep 5 ####### MAY NEED TO ADD MORE TIME...
+    sleep 10
     echo
     printf "MySQL-ReplicationExample.sh - Drained $NODE0 - mysql-2 fully recovered to [..."
     while true
@@ -297,7 +295,7 @@ then
     kubectl scale statefulset mysql  --replicas=5
     echo
     printf "Scaled to 5 - Waiting for mysql-3/4 to come up [..."
-    sleep 35
+    sleep 45
     while true
 	do
         TASK=$(kubectl get pod mysql-4 -o wide | awk '{print $3}' | sed -n 2p)
