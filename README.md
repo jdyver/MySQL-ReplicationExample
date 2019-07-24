@@ -92,6 +92,32 @@ Error attaching, falling back to logs: unable to upgrade connection: container m
 pod "mysql-client-loop" deleted
 ```
 #### Application Test Section:
+
+NOTE:
+In a separate terminal run the loop to show which servers are getting hits:
+- Exit with CTRL-C
+```
+ Scripts $ kubectl run mysql-client-loop-forever --image=mysql:5.7 -i -t --rm --restart=Never --\
+ bash -ic "while sleep 1; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
+If you don't see a command prompt, try pressing enter.
++-------------+---------------------+
+| @@server_id | NOW()               |
++-------------+---------------------+
+|         100 | 2019-06-12 21:52:27 |
++-------------+---------------------+
++-------------+---------------------+
+| @@server_id | NOW()               |
++-------------+---------------------+
+|         102 | 2019-06-12 21:52:28 |
++-------------+---------------------+
++-------------+---------------------+
+| @@server_id | NOW()               |
++-------------+---------------------+
+|         101 | 2019-06-12 21:52:29 |
++-------------+---------------------+
+^C
+```
+
 Test application only: MySQL-ReplicationExample.sh -t | test
 
 - Test SQL Service Failure: Restarting mysql-2 service
