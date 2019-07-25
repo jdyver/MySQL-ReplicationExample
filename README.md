@@ -90,6 +90,16 @@ Error attaching, falling back to logs: unable to upgrade connection: container m
 |         101 | 2019-06-28 22:33:35 |
 +-------------+---------------------+
 pod "mysql-client-loop" deleted
+
+ MySQL-ReplicationExample.sh - Also note that these pods are on persistent volume claims
+ kubectl get pvc -l app=mysql
+NAME           STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS           AGE
+data-mysql-0   Bound    pvc-21c6feb0-a552-402e-944c-58bae0a202f4   10Gi       RWO            awsebscsiprovisioner   2m2s
+data-mysql-1   Bound    pvc-c3c00c26-cda9-4deb-be31-040363f28417   10Gi       RWO            awsebscsiprovisioner   95s
+data-mysql-2   Bound    pvc-4ae8aa81-9fa8-42f6-81d2-06257a458b3d   10Gi       RWO            awsebscsiprovisioner   62s
+
+ MySQL-ReplicationExample.sh - MySQL Pods replicating and populated
+ - To run through tests: MySQL-ReplicationExample.sh -t | test
 ```
 #### Application Test Section:
 
@@ -99,6 +109,8 @@ NOTE:
 In a separate terminal run the loop to show which servers are getting hits:
 - Exit with CTRL-C
 ```
+ JD $ bash MySQL-ReplicationExample.sh test
+ 
   MySQL-ReplicationExample.sh (Optional) - For live test open another terminal and run:
  kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "while sleep 1; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
 
@@ -274,7 +286,7 @@ mysql-4   1/2     Running   0          28s
 +-------------+---------------------+
 | @@server_id | NOW()               |
 +-------------+---------------------+
-|         **104** | 2019-07-25 01:38:42 |
+|         104 | 2019-07-25 01:38:42 |
 +-------------+---------------------+
 +-------------+---------------------+
 | @@server_id | NOW()               |
@@ -284,7 +296,7 @@ mysql-4   1/2     Running   0          28s
 +-------------+---------------------+
 | @@server_id | NOW()               |
 +-------------+---------------------+
-|         **103** | 2019-07-25 01:38:42 |
+|         103 | 2019-07-25 01:38:42 |
 +-------------+---------------------+
 +-------------+---------------------+
 | @@server_id | NOW()               |
