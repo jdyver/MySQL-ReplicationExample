@@ -93,12 +93,17 @@ pod "mysql-client-loop" deleted
 ```
 #### Application Test Section:
 
+Test application only: MySQL-ReplicationExample.sh -t | test
+
 NOTE:
 In a separate terminal run the loop to show which servers are getting hits:
 - Exit with CTRL-C
 ```
- Scripts $ kubectl run mysql-client-loop-forever --image=mysql:5.7 -i -t --rm --restart=Never --\
- bash -ic "while sleep 1; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
+  MySQL-ReplicationExample.sh (Optional) - For live test open another terminal and run:
+ kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "while sleep 1; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
+
+ Press ENTER to continue:
+
 If you don't see a command prompt, try pressing enter.
 +-------------+---------------------+
 | @@server_id | NOW()               |
@@ -118,44 +123,47 @@ If you don't see a command prompt, try pressing enter.
 ^C
 ```
 
-Test application only: MySQL-ReplicationExample.sh -t | test
-
 - Test SQL Service Failure: Restarting mysql-2 service
 ```
  MySQL-ReplicationExample.sh - Testing SQL service failure (restarting mysql-2 service)
  $ kubectl exec mysql-2 -c mysql -- /etc/init.d/mysql restart
-Stopping MySQL Community Server 5.7.26.
+Stopping MySQL Community Server 5.7.27.
 ..command terminated with exit code 137
 
- MySQL-ReplicationExample.sh - kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
+ MySQL-ReplicationExample.sh - Checking which servers are getting hits
+If you don't see a command prompt, try pressing enter.
+Error attaching, falling back to logs: unable to upgrade connection: container mysql-client-loop not found in pod mysql-client-loop_default
 +-------------+---------------------+
 | @@server_id | NOW()               |
 +-------------+---------------------+
-|         101 | 2019-06-28 22:33:42 |
-+-------------+---------------------+
-+-------------+---------------------+
-| @@server_id | NOW()               |
-+-------------+---------------------+
-|         101 | 2019-06-28 22:33:42 |
+|         100 | 2019-07-25 01:34:45 |
 +-------------+---------------------+
 +-------------+---------------------+
 | @@server_id | NOW()               |
 +-------------+---------------------+
-|         101 | 2019-06-28 22:33:42 |
+|         100 | 2019-07-25 01:34:45 |
 +-------------+---------------------+
 +-------------+---------------------+
 | @@server_id | NOW()               |
 +-------------+---------------------+
-|         101 | 2019-06-28 22:33:42 |
+|         101 | 2019-07-25 01:34:45 |
 +-------------+---------------------+
 +-------------+---------------------+
 | @@server_id | NOW()               |
 +-------------+---------------------+
-|         101 | 2019-06-28 22:33:42 |
+|         101 | 2019-07-25 01:34:46 |
++-------------+---------------------+
++-------------+---------------------+
+| @@server_id | NOW()               |
++-------------+---------------------+
+|         100 | 2019-07-25 01:34:46 |
 +-------------+---------------------+
 pod "mysql-client-loop" deleted
 
  MySQL-ReplicationExample.sh - Notice zero MySQL-2 (Server: 102) query hits above
+
+ Press ENTER to continue:
+
 ```
 
 - Test SQL Pod Failure: Delete mysql-2's pod and see automatic recovery
@@ -166,107 +174,134 @@ pod "mysql-2" deleted
 
  $ kubectl get pods -l app=mysql
 NAME      READY   STATUS     RESTARTS   AGE
-mysql-0   2/2     Running    0          2m52s
-mysql-1   2/2     Running    0          2m23s
+mysql-0   2/2     Running    0          7h33m
+mysql-1   2/2     Running    0          7h33m
 mysql-2   0/2     Init:0/2   0          0s
 
- MySQL-ReplicationExample.sh - kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
+ MySQL-ReplicationExample.sh - Checking which servers are getting hits
 +-------------+---------------------+
 | @@server_id | NOW()               |
 +-------------+---------------------+
-|         100 | 2019-06-28 22:34:26 |
-+-------------+---------------------+
-+-------------+---------------------+
-| @@server_id | NOW()               |
-+-------------+---------------------+
-|         100 | 2019-06-28 22:34:26 |
+|         101 | 2019-07-25 01:35:40 |
 +-------------+---------------------+
 +-------------+---------------------+
 | @@server_id | NOW()               |
 +-------------+---------------------+
-|         100 | 2019-06-28 22:34:26 |
+|         101 | 2019-07-25 01:35:40 |
 +-------------+---------------------+
 +-------------+---------------------+
 | @@server_id | NOW()               |
 +-------------+---------------------+
-|         100 | 2019-06-28 22:34:26 |
+|         101 | 2019-07-25 01:35:40 |
 +-------------+---------------------+
 +-------------+---------------------+
 | @@server_id | NOW()               |
 +-------------+---------------------+
-|         101 | 2019-06-28 22:34:26 |
+|         100 | 2019-07-25 01:35:40 |
++-------------+---------------------+
++-------------+---------------------+
+| @@server_id | NOW()               |
++-------------+---------------------+
+|         100 | 2019-07-25 01:35:40 |
 +-------------+---------------------+
 pod "mysql-client-loop" deleted
 
  MySQL-ReplicationExample.sh - Notice zero MySQL-2 (Server: 102) query hits above
+
+ MySQL-ReplicationExample.sh - Waiting for MySQL Pod 2 Deployment [....] - Up
+ MySQL-ReplicationExample.sh: kubectl get pods -l app=mysql
+NAME      READY   STATUS    RESTARTS   AGE
+mysql-0   2/2     Running   0          7h34m
+mysql-1   2/2     Running   0          7h33m
+mysql-2   2/2     Running   0          16s
+
+ Press ENTER to continue:
 ```
 
 - Test Node Drain: Drain mysql-2's node and see automatic recovery
-(Love bugs...  broke in automation bc the pod isn't finished intializing from previous test; will add check)
-
 ```
  MySQL-ReplicationExample.sh - Testing automatic pod recovery from node drain
- $ kubectl drain Init:0/2 --force --delete-local-data --ignore-daemonsets
-error: the server doesn't have a resource type "Init:0"
+ $ kubectl drain ip-10-0-130-41.us-west-2.compute.internal --force --delete-local-data --ignore-daemonsets
+node/ip-10-0-130-41.us-west-2.compute.internal cordoned
+WARNING: ignoring DaemonSet-managed Pods: kube-system/calico-node-k86wt, kube-system/ebs-csi-node-vl45v, kube-system/kube-proxy-rsdq2, kubeaddons/fluentbit-kubeaddons-fluent-bit-696br, kubeaddons/prometheus-kubeaddons-prometheus-node-exporter-g5tzt
+evicting pod "elasticsearch-kubeaddons-data-0"
+evicting pod "mysql-2"
+pod/elasticsearch-kubeaddons-data-0 evicted
+pod/mysql-2 evicted
+node/ip-10-0-130-41.us-west-2.compute.internal evicted
 
  $ kubectl get pod mysql-2 -o wide
-NAME      READY   STATUS            RESTARTS   AGE   IP               NODE                                        NOMINATED NODE   READINESS GATES
-mysql-2   0/2     PodInitializing   0          7s    192.168.114.90   ip-10-0-129-23.us-west-2.compute.internal   <none>           <none>
+NAME      READY   STATUS     RESTARTS   AGE   IP       NODE                                         NOMINATED NODE   READINESS GATES
+mysql-2   0/2     Init:0/2   0          1s    <none>   ip-10-0-128-210.us-west-2.compute.internal   <none>           <none>
 
-MySQL-ReplicationExample.sh - Drained Init:0/2 - mysql-2 fully recovered to [....] Running
-NAME      READY   STATUS    RESTARTS   AGE   IP               NODE                                        NOMINATED NODE   READINESS GATES
-mysql-2   2/2     Running   0          15s   192.168.114.90   ip-10-0-129-23.us-west-2.compute.internal   <none>           <none>
+MySQL-ReplicationExample.sh - Drained ip-10-0-130-41.us-west-2.compute.internal - mysql-2 fully recovered to [......] ip-10-0-128-210.us-west-2.compute.internal
+NAME      READY   STATUS    RESTARTS   AGE   IP               NODE                                         NOMINATED NODE   READINESS GATES
+mysql-2   1/2     Running   0          24s   192.168.28.149   ip-10-0-128-210.us-west-2.compute.internal   <none>           <none>
 
-MySQL-ReplicationExample.sh - Testing automatic pod recovery from node drain
- $ kubectl get pods -l app=mysql
-NAME      READY   STATUS    RESTARTS   AGE
-mysql-0   2/2     Running   0          3m7s
-mysql-1   2/2     Running   0          2m38s
-mysql-2   2/2     Running   0          15s
+ Press ENTER to continue:
+
+MySQL-ReplicationExample.sh - Bring node back
+ $ kubectl uncordon ip-10-0-130-41.us-west-2.compute.internal
+node/ip-10-0-130-41.us-west-2.compute.internal uncordoned
 ```
 
 - Test SQL Scale: Increase mysql's pods to 5
-
 ```
+MySQL-ReplicationExample.sh - Testing pod scale from 3 to 5
+ $ kubectl get pods -l app=mysql
+NAME      READY   STATUS    RESTARTS   AGE
+mysql-0   2/2     Running   0          7h35m
+mysql-1   2/2     Running   0          7h35m
+mysql-2   2/2     Running   0          51s
+
  $ kubectl scale statefulset mysql  --replicas=5
 statefulset.apps/mysql scaled
 
-Scaled to 5 - Waiting for mysql-3/4 to come up [...Error from server (NotFound): pods "mysql-4" not found
-.......] - UpNAME      READY   STATUS    RESTARTS   AGE
-mysql-0   2/2     Running   0          4m24s
-mysql-1   2/2     Running   0          3m55s
-mysql-2   2/2     Running   0          92s
-mysql-3   2/2     Running   0          76s
-mysql-4   1/2     Running   0          36s
+Scaled to 5 - Waiting for mysql-3/4 to come up [.......] - Up
+NAME      READY   STATUS    RESTARTS   AGE
+mysql-0   2/2     Running   0          7h36m
+mysql-1   2/2     Running   0          7h36m
+mysql-2   2/2     Running   0          114s
+mysql-3   2/2     Running   0          63s
+mysql-4   1/2     Running   0          28s
 
+ MySQL-ReplicationExample.sh - Checking which servers are getting hits
 +-------------+---------------------+
 | @@server_id | NOW()               |
 +-------------+---------------------+
-|         102 | 2019-06-28 22:35:57 |
-+-------------+---------------------+
-+-------------+---------------------+
-| @@server_id | NOW()               |
-+-------------+---------------------+
-|         101 | 2019-06-28 22:35:57 |
+|         100 | 2019-07-25 01:38:42 |
 +-------------+---------------------+
 +-------------+---------------------+
 | @@server_id | NOW()               |
 +-------------+---------------------+
-|         101 | 2019-06-28 22:35:57 |
+|         **104** | 2019-07-25 01:38:42 |
 +-------------+---------------------+
 +-------------+---------------------+
 | @@server_id | NOW()               |
 +-------------+---------------------+
-|         100 | 2019-06-28 22:35:57 |
+|         102 | 2019-07-25 01:38:42 |
 +-------------+---------------------+
 +-------------+---------------------+
 | @@server_id | NOW()               |
 +-------------+---------------------+
-|         103 | 2019-06-28 22:35:57 |
+|         **103** | 2019-07-25 01:38:42 |
++-------------+---------------------+
++-------------+---------------------+
+| @@server_id | NOW()               |
++-------------+---------------------+
+|         100 | 2019-07-25 01:38:42 |
 +-------------+---------------------+
 pod "mysql-client-loop" deleted
 
  MySQL-ReplicationExample.sh - Notice MySQL-3 / 4 (Server: 103 / 104) query hits above
+
+
+ Press ENTER to continue:
+
+ MySQL-ReplicationExample.sh - Going back to 3
+statefulset.apps/mysql scaled
+persistentvolumeclaim "data-mysql-3" deleted
+persistentvolumeclaim "data-mysql-4" deleted
 
  MySQL-ReplicationExample.sh - Testing Complete
 ```
