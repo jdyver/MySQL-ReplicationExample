@@ -150,7 +150,7 @@ case "$1" in
     fi
 
     echo " MySQL-ReplicationExample.sh - kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic \"for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done\""
-    kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
+    kubectl run mysql-repx-mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
     echo
 
     echo " MySQL-ReplicationExample.sh - Also note that these pods are on persistent volume claims"
@@ -231,7 +231,7 @@ then
     echo
     echo " MySQL-ReplicationExample.sh - Checking which servers are getting hits"
 #    echo " MySQL-ReplicationExample.sh - kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic \"for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done\""
-    kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
+    kubectl run mysql-repx-mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
     echo
     echo " MySQL-ReplicationExample.sh - Notice zero MySQL-2 (Server: 102) query hits above"
     echo
@@ -248,7 +248,7 @@ then
     echo    
     echo " MySQL-ReplicationExample.sh - Checking which servers are getting hits"
 #    echo " MySQL-ReplicationExample.sh - kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic \"for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done\""
-    kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
+    kubectl run mysql-repx-mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
     echo
     echo " MySQL-ReplicationExample.sh - Notice zero MySQL-2 (Server: 102) query hits above"
     echo
@@ -335,7 +335,7 @@ then
     echo    
     echo " MySQL-ReplicationExample.sh - Checking which servers are getting hits"
     # echo " MySQL-ReplicationExample.sh - kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic \"for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done\""
-    kubectl run mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
+    kubectl run mysql-repx-mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "for i in {1..5}; do mysql -h mysql-read -e 'SELECT @@server_id,NOW()'; done"
     echo
     echo " MySQL-ReplicationExample.sh - Notice MySQL-3 / 4 (Server: 103 / 104) query hits above"
     echo
